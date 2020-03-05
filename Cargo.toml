@@ -1,0 +1,8 @@
+[package]
+name = "ogger"
+version = "0.1.0"
+authors = ["Hans Ole Hatzel <hhatzel@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ogg-sys = "0.0.9"
