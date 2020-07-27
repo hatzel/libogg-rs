@@ -1,10 +1,10 @@
-pub mod stream;
 pub mod packet;
 pub mod page;
+pub mod stream;
 
-pub use crate::stream::Stream;
 pub use crate::packet::Packet;
 pub use crate::page::Page;
+pub use crate::stream::Stream;
 
 use std::fmt::{self, Display, Formatter};
 
@@ -21,8 +21,8 @@ impl Display for Error {
 
 #[cfg(test)]
 mod tests {
-    use crate::stream::Stream;
     use crate::packet::Packet;
+    use crate::stream::Stream;
     #[test]
     fn init_stream() {
         let _stream = Stream::new(32);
@@ -55,7 +55,7 @@ mod tests {
                     Some(page) => {
                         println!("header: {:?}/body {:?}", page.header, page.body);
                         break;
-                    },
+                    }
                     None => {
                         let mut vec = Vec::new();
                         for x in 0..255 {

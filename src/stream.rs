@@ -1,10 +1,10 @@
-use std::mem;
 use std::fmt;
+use std::mem;
 
 use ogg_sys::ogg_stream_state;
 
 use crate::packet::Packet;
-use crate::page::{Page, InternalPage};
+use crate::page::{InternalPage, Page};
 
 pub struct Stream(ogg_stream_state);
 
@@ -73,7 +73,9 @@ impl Stream {
 
     pub fn packetin(&mut self, packet: &mut Packet) {
         // Internally the data is copied so this is safe
-        unsafe { ogg_sys::ogg_stream_packetin(&mut self.0, &mut packet.inner); }
+        unsafe {
+            ogg_sys::ogg_stream_packetin(&mut self.0, &mut packet.inner);
+        }
     }
 
     /// Return the next page in the stream
@@ -160,6 +162,8 @@ impl fmt::Debug for Stream {
 impl Drop for Stream {
     fn drop(&mut self) {
         // Don't call destroy here, it will attempt to free self.0 itself
-        unsafe { ogg_sys::ogg_stream_clear(&mut self.0); }
+        unsafe {
+            ogg_sys::ogg_stream_clear(&mut self.0);
+        }
     }
 }
