@@ -3,6 +3,13 @@ name = "libogg"
 version = "0.1.0"
 authors = ["Hans Ole Hatzel <hhatzel@gmail.com>"]
 edition = "2018"
+build = "build.rs"
 
 [dependencies]
 ogg-sys = "0.0.9"
+
+[build-dependencies]
+skeptic = "0.13"
+
+[dev-dependencies]
+skeptic = "0.13"
