@@ -1,5 +1,7 @@
 # Safe Rust Bindings for libogg
 
+![CI](https://github.com/hatzel/libogg-rs/workflows/CI/badge.svg)
+
 Simple bindings for libogg.
 
 In most cases it should be preferable to use the [ogg crate](https://github.com/RustAudio/ogg).
