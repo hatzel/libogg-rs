@@ -14,7 +14,9 @@ invalidation would make the API more complicated.
 ## Simple Example
 
 ```rust
+extern crate libogg;
 use libogg::{Packet, Stream};
+
 fn main() {
     let mut stream = Stream::new(1234); // provide a unique stream id
 
