@@ -6,11 +6,11 @@ pub struct Packet {
 }
 
 impl Packet {
-    pub fn new<'a, T: 'a + AsMut<[u8]>>(data: &mut T) -> Self {
+    pub fn new<'a, T: 'a + AsRef<[u8]>>(data: &T) -> Self {
         Packet {
             inner: ogg_packet {
-                packet: data.as_mut().as_mut_ptr(),
-                bytes: data.as_mut().len() as i64,
+                packet: data.as_ref().as_ptr() as *mut u8,
+                bytes: data.as_ref().len() as i64,
                 b_o_s: 0,
                 e_o_s: 0,
                 granulepos: 0,
@@ -19,20 +19,20 @@ impl Packet {
         }
     }
 
-    pub fn get_bos(&self) -> i64 {
-        self.inner.b_o_s
+    pub fn get_bos(&self) -> bool {
+        self.inner.b_o_s == 1
     }
 
-    pub fn set_bos(&mut self, bos: i64) {
-        self.inner.b_o_s = bos;
+    pub fn set_bos(&mut self, bos: bool) {
+        self.inner.b_o_s = if bos { 1 } else { 0 };
     }
 
-    pub fn get_eos(&self) -> i64 {
-        self.inner.e_o_s
+    pub fn get_eos(&self) -> bool {
+        self.inner.e_o_s == 1
     }
 
-    pub fn set_eos(&mut self, eos: i64) {
-        self.inner.e_o_s = eos;
+    pub fn set_eos(&mut self, eos: bool) {
+        self.inner.e_o_s = if eos { 1 } else { 0 };
     }
 
     pub fn get_granulepos(&self) -> i64 {

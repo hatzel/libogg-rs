@@ -2,6 +2,10 @@ pub mod stream;
 pub mod packet;
 pub mod page;
 
+pub use crate::stream::Stream;
+pub use crate::packet::Packet;
+pub use crate::page::Page;
+
 #[cfg(test)]
 mod tests {
     use crate::stream::Stream;
@@ -34,13 +38,9 @@ mod tests {
         let mut s = Stream::new(0);
         for _ in 0..10 {
             loop {
-                match s.next() {
+                match s.pageout() {
                     Some(page) => {
-                        let header = page.get_header();
-                        println!("header: {:?}", header);
-                        let body = page.get_body();
-                        println!("body: {:?}", body);
-                        println!("{:?}", page);
+                        println!("header: {:?}/body {:?}", page.header, page.body);
                         break;
                     },
                     None => {

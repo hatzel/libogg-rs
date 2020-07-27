@@ -4,7 +4,7 @@ use std::fmt;
 use ogg_sys::ogg_stream_state;
 
 use crate::packet::Packet;
-use crate::page::Page;
+use crate::page::{Page, InternalPage};
 
 pub struct Stream(ogg_stream_state);
 
@@ -19,13 +19,6 @@ impl Stream {
         }
     }
 
-    // pub body_data: *mut libc::c_uchar,
-    // pub body_storage: libc::c_long,
-    // pub body_fill: libc::c_long,
-    // pub body_returned: libc::c_long,
-
-    // pub lacing_vals: *mut libc::c_int,
-    // pub granule_vals: *mut ogg_int64_t,
     pub fn get_lacing_storage(&self) -> i64 {
         self.0.lacing_storage
     }
@@ -66,6 +59,10 @@ impl Stream {
         self.0.pageno
     }
 
+    pub fn set_pageno(&mut self, new_pageno: i64) {
+        self.0.pageno = new_pageno;
+    }
+
     pub fn get_packetno(&self) -> i64 {
         self.0.packetno
     }
@@ -77,6 +74,74 @@ impl Stream {
     pub fn packetin(&mut self, packet: &mut Packet) {
         // Internally the data is copied so this is safe
         unsafe { ogg_sys::ogg_stream_packetin(&mut self.0, &mut packet.inner); }
+    }
+
+    /// Return the next page in the stream
+    ///
+    /// May return None if not enough data was added to the stream.
+    /// To ensure that the last page contains all data use `flush` or `fill_flush`.
+    pub fn pageout(&mut self) -> Option<Page> {
+        let (ret, page) = unsafe {
+            let mut page: ogg_sys::ogg_page = std::mem::MaybeUninit::uninit().assume_init();
+            let ret = ogg_sys::ogg_stream_pageout(&mut self.0, &mut page);
+            (ret, page)
+        };
+        if ret == 0 {
+            None
+        } else {
+            let internal_page = InternalPage(page);
+            Some(Page {
+                header: internal_page.get_header().to_owned(),
+                body: internal_page.get_body().to_owned(),
+            })
+        }
+    }
+
+    /// Returns None if no packages are available for flushing
+    pub fn flush(&mut self) -> Option<Page> {
+        let (ret, page) = unsafe {
+            let mut page: ogg_sys::ogg_page = std::mem::MaybeUninit::uninit().assume_init();
+            let ret = ogg_sys::ogg_stream_flush(&mut self.0, &mut page);
+            (ret, page)
+        };
+        if ret == 0 {
+            None
+        } else {
+            let internal_page = InternalPage(page);
+            Some(Page {
+                header: internal_page.get_header().to_owned(),
+                body: internal_page.get_body().to_owned(),
+            })
+        }
+    }
+
+    pub fn flush_fill(&mut self) -> Option<Page> {
+        let (ret, page) = unsafe {
+            let mut page: ogg_sys::ogg_page = std::mem::MaybeUninit::uninit().assume_init();
+            let ret = ogg_sys::ogg_stream_flush_fill(&mut self.0, &mut page, -1);
+            (ret, page)
+        };
+        if ret == 0 {
+            None
+        } else {
+            let internal_page = InternalPage(page);
+            Some(Page {
+                header: internal_page.get_header().to_owned(),
+                body: internal_page.get_body().to_owned(),
+            })
+        }
+    }
+
+    /// Reset the stream state
+    pub fn reset(&mut self) {
+        unsafe {
+            if ogg_sys::ogg_stream_reset(&mut self.0) == 0 {
+                ()
+            } else {
+                // TODO: don't panic
+                panic!("Resetting failed");
+            }
+        }
     }
 }
 
@@ -97,22 +162,5 @@ impl Drop for Stream {
     fn drop(&mut self) {
         // Don't call destroy here, it will attempt to free self.0 itself
         unsafe { ogg_sys::ogg_stream_clear(&mut self.0); }
-    }
-}
-
-impl Iterator for Stream {
-    type Item = Page;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let (ret, p) = unsafe {
-            let mut p: ogg_sys::ogg_page = std::mem::MaybeUninit::uninit().assume_init();
-            let ret = ogg_sys::ogg_stream_pageout(&mut self.0, &mut p);
-            (ret, p)
-        };
-        if ret == 0 {
-            None
-        } else {
-            Some(Page(p))
-        }
     }
 }
