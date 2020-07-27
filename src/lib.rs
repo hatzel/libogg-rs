@@ -6,6 +6,19 @@ pub use crate::stream::Stream;
 pub use crate::packet::Packet;
 pub use crate::page::Page;
 
+use std::fmt::{self, Display, Formatter};
+
+#[derive(Debug)]
+pub enum Error {
+    InternalError,
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Internal libogg error")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::stream::Stream;

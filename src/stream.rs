@@ -133,13 +133,12 @@ impl Stream {
     }
 
     /// Reset the stream state
-    pub fn reset(&mut self) {
+    pub fn reset(&mut self) -> Result<(), crate::Error> {
         unsafe {
             if ogg_sys::ogg_stream_reset(&mut self.0) == 0 {
-                ()
+                Ok(())
             } else {
-                // TODO: don't panic
-                panic!("Resetting failed");
+                Err(crate::Error::InternalError)
             }
         }
     }
