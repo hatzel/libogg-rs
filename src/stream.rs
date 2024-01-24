@@ -35,6 +35,18 @@ impl Stream {
         self.0.lacing_returned
     }
 
+    pub fn get_body_storage(&self) -> i64 {
+        self.0.body_storage
+    }
+
+    pub fn get_body_fill(&self) -> i64 {
+        self.0.body_fill
+    }
+
+    pub fn get_body_returned(&self) -> i64 {
+        self.0.body_returned
+    }
+    
     pub fn get_header(&self) -> &[u8; 282] {
         &self.0.header
     }
