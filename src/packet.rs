@@ -6,11 +6,26 @@ pub struct Packet {
 }
 
 impl Packet {
+    #[cfg(not(target_os = "windows"))]
     pub fn new<'a, T: 'a + AsRef<[u8]>>(data: &T) -> Self {
         Packet {
             inner: ogg_packet {
                 packet: data.as_ref().as_ptr() as *mut u8,
                 bytes: data.as_ref().len() as i64,
+                b_o_s: 0,
+                e_o_s: 0,
+                granulepos: 0,
+                packetno: 0,
+            },
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn new<'a, T: 'a + AsRef<[u8]>>(data: &T) -> Self {
+        Packet {
+            inner: ogg_packet {
+                packet: data.as_ref().as_ptr() as *mut u8,
+                bytes: data.as_ref().len() as i32,
                 b_o_s: 0,
                 e_o_s: 0,
                 granulepos: 0,

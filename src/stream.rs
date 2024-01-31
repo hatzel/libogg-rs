@@ -1,3 +1,4 @@
+use std::convert::TryInto;
 use std::fmt;
 use std::mem;
 
@@ -19,34 +20,41 @@ impl Stream {
         }
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_lacing_storage(&self) -> i64 {
-        self.0.lacing_storage
+        self.0.lacing_storage.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_lacing_fill(&self) -> i64 {
-        self.0.lacing_fill
+        self.0.lacing_fill.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_lacing_packet(&self) -> i64 {
-        self.0.lacing_packet
+        self.0.lacing_packet.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_lacing_returned(&self) -> i64 {
-        self.0.lacing_returned
+        self.0.lacing_returned.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_body_storage(&self) -> i64 {
-        self.0.body_storage
+        self.0.body_storage.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_body_fill(&self) -> i64 {
-        self.0.body_fill
+        self.0.body_fill.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_body_returned(&self) -> i64 {
-        self.0.body_returned
+        self.0.body_returned.into()
     }
-    
+
     pub fn get_header(&self) -> &[u8; 282] {
         &self.0.header
     }
@@ -63,16 +71,22 @@ impl Stream {
         self.0.b_o_s
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_serialno(&self) -> i64 {
-        self.0.serialno
+        self.0.serialno.into()
     }
 
+    #[allow(clippy::useless_conversion)]
     pub fn get_pageno(&self) -> i64 {
-        self.0.pageno
+        self.0.pageno.into()
     }
 
-    pub fn set_pageno(&mut self, new_pageno: i64) {
-        self.0.pageno = new_pageno;
+    #[allow(clippy::useless_conversion)]
+    pub fn set_pageno(&mut self, new_pageno: i64) -> Result<(), crate::Error> {
+        self.0.pageno = new_pageno
+            .try_into()
+            .map_err(|_| crate::Error::TypeCastingError)?;
+        Ok(())
     }
 
     pub fn get_packetno(&self) -> i64 {
