@@ -11,11 +11,15 @@ use std::fmt::{self, Display, Formatter};
 #[derive(Debug)]
 pub enum Error {
     InternalError,
+    TypeCastingError,
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Internal libogg error")
+        match self {
+            Error::InternalError => write!(f, "Internal libogg error"),
+            Error::TypeCastingError => write!(f, "Type casting error"),
+        }
     }
 }
 
